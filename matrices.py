@@ -39,10 +39,23 @@ def print_matrix(M):
         else:
             print(']]')
 
-#print(matrix_zeros(4, 2))
+def matrix_add(A, B):
+    C = matrix_zeros(len(A), len(A[0]))
+    for i in range(len(A)):
+        for j in range(len(A[0])):
+            C[i][j] = A[i][j] + B[i][j]
+    return C
 
-N = [[0, 0], [0, 0], [0, 0], [0, 0], [1, 1]]
+def matrix_multiply(A, B):
+    C = matrix_zeros(len(A), len(B[0]))
+    for k in range(len(B[0])):
+        for i in range(len(A)):
+            mult = 0
+            for j in range(len(A[0])):
+                mult += A[i][j] * B[j][k]
+            C[i][k] = mult
+    return C
 
-#print(copy_matrix(N))
-
-print_matrix(N)
+B = [[6, 4], 
+     [4, 8], 
+     [3, 5]]
