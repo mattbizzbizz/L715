@@ -24,10 +24,20 @@ def copy_matrix(M):
     return copy
 
 def print_matrix(M):
-    print("[", end = '')
-    for row in M:
-        print(row, end = '')
-    print("]")
+    print('[', end = '')
+    for i, row in enumerate(M):
+        if i == 0:
+            print('[', end = '')
+        else:
+            print(' [', end = '')
+        for j, num in enumerate(row):
+            print(num, end = '')
+            if j != (len(row) - 1):
+                print(', ', end = '')
+        if i != (len(M) - 1):
+            print('],')
+        else:
+            print(']]')
 
 #print(matrix_zeros(4, 2))
 
