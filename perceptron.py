@@ -11,14 +11,16 @@
 
 import numpy as np
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt, lines, animation
 
-weights = [] # list of weights
+weights = np.random.rand(2) # list of weights
 df = [] # list perceptron training data
+df_pos = [] # list of perceptron training data with 1 output values
+df_neg = [] # list of perceptron training data with 0 output values
 epochs = 25 # number of epochs to run
 bias = np.random.rand() # value for the bias
 alpha = 0.001 # learning rate
+decision_boundaries = []
 
 # Open .tsv file
 with open('perceptron_training_data.tsv') as file:
@@ -30,38 +32,39 @@ with open('perceptron_training_data.tsv') as file:
         l[2] = int(l[2])
         df.append(l)
 
-
-df_pos = []
-df_neg = []
 for line in df:
     if line[2]:
         df_pos.append(line)
     else:
         df_neg.append(line)
 
-minx = min([row[0] for row in df]) 
-maxx = max([row[0] for row in df]) 
-miny = min([row[1] for row in df])
-maxy = max([row[1] for row in df])
+minx = min([row[0] for row in df]) # the minimum value for feature 1
+maxx = max([row[0] for row in df]) # the maximum value for feature 1
+miny = min([row[1] for row in df]) # the minimum value for feature 2
+maxy = max([row[1] for row in df]) # the maximum value for feature 2
 
-weights.append(np.random.rand())
-weights.append(np.random.rand())
+def get_decision_boundary():
+    global decision_boundaries
+    y0 = (-bias - minx * weights[0]) / weights[1]
+    y1 = (-bias - maxx * weights[1]) / weights[1]
+    decision_boundaries.append([y0, y1])
 
-for i in range(epochs):
+get_decision_boundary()
 
-    print("Epoch:", i + 1)
-    count = 0
+for epoch in range(epochs):
+
+    correct = 0
 
     for row in df:
 
         x = [row[0], row[1]]
         y_hat = 0.0
 
-        if (np.dot(x, weights)) > 0:
+        if (np.dot(x, weights) + bias) > 0:
             y_hat = 1.0
 
         if y_hat == row[2]:
-            count += 1
+            correct += 1
         else:
             if y_hat == 0:
                 weights = np.add(weights, [alpha * value for value in x])
@@ -70,19 +73,28 @@ for i in range(epochs):
                 weights = np.subtract(weights, [alpha * value for value in x])
                 bias -= alpha
 
-    print(weights)
+    get_decision_boundary()
 
-    fig, ax = plt.subplots()
+    accuracy = correct/len(df) * 100
+    print('=========EPOCH========= {}'.format(epoch + 1))
+    print('Accuracy: {}%'.format(accuracy))
+    print('Weights:', weights)
+    print('Bias:', bias)
+    print('Decision Boundary:', decision_boundaries[-1])
+    print()
+
+
+    if correct == len(df):
+        break
+
+fig, ax = plt.subplots()
+def acb(i):
+    ax.clear()
     ax.set_xlim([minx - 0.5, maxx + 0.5])
     ax.set_ylim([miny - 0.5, maxy + 0.5])
-    ax.set_title(f'Epoch {i}')
+    ax.set_title(f'Epoch{i+1}')
     ax.scatter([j[0] for j in df_pos], [k[1] for k in df_pos], c = 'red')
     ax.scatter([j[0] for j in df_neg], [k[1] for k in df_neg], c = 'blue')
-    y0 = (-bias - minx * weights[0]) / weights[1]
-    y1 = (-bias - maxx * weights[1]) / weights[1]
-    ax.plot([minx, maxx], [y0, y1])
-    plt.show()
-
-    print("Number of correctly classified examples:", count)
-    if count == len(df):
-        break
+    ax.plot([minx, maxx], decision_boundaries[i])
+anim = animation.FuncAnimation(fig, acb, frames = len(decision_boundaries))
+plt.show()
