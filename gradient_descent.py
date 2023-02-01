@@ -1,31 +1,56 @@
+# References:
+#   https://numpy.org/doc/stable/reference/generated/
+
 import numpy as np
 from matplotlib import pyplot as plt
+
+def gradient_descent(W, X, Y, A, E):
+
+    C = []
+
+    for e in range(E):
+        Y_hat = X * W
+        C.append(0.5 / len(X) * np.sum(np.square(Y_hat - Y)))
+        W = W - A * np.sum(np.multiply(X, Y_hat - Y)) / len(X)
+
+    return C
+
+
+def stocastic_gradient_descent(W, X, Y, A, E):
+
+    C = []
+
+    for e in range(E):
+
+        print("------Epoch " + str(e) + "------")
+
+        np.random.shuffle(X)
+        Y_hat = X * W
+        C.append(0.5 / len(X) * np.sum(np.square(Y_hat - Y)))
+
+        for i in range(len(Y)):
+            W = W - A * (X[i] * (Y_hat[i] - Y[i])) / len(X)
+
+    return C
 
 np.random.seed(3)
 
 epochs = 50
 alphas = [0.1, 0.01, 0.001]
 
-#x = np.random.randn(100, 1)
-#y = 4 + 3 * x + np.random.randn(100, 1)
-x = np.random.randn(5, 1)
-y = 4 + 3 * x + np.random.randn(5, 1)
-weights = np.random.randn(1, len(alphas))
-m =  len(x)
+x = np.random.randn(100, 1)
+y = 4 + 3 * x + np.random.randn(100, 1)
+weight = np.random.rand()
 costs = []
-costs_alpha = []
 
-for num_alpha, alpha in enumerate(alphas):
-    for epoch in range(epochs):
-        y_hat = x * weights[0,num_alpha]
-        print(y_hat)
-        costs.append(0.5 * m * np.sum(np.square(y_hat - y)))
-        print(sum(np.multiply(x, np.subtract(y_hat, y))))
-        weights[0, num_alpha] = weights[0, num_alpha] - alpha * np.sum(np.multiply(x, np.subtract(y_hat, y))) / m
-    costs_alpha.append(costs)
+for alpha in alphas:
+    costs.append(gradient_descent(weight, x, y, alpha, epochs))
+for alpha in alphas:
+    costs.append(stocastic_gradient_descent(weight, np.copy(x), y, alpha, epochs))
+
 
 fi, ax = plt.subplots()
-#ax.scatter(x, y)
-for num_alpha_2, alpha in enumerate(alphas):
-    ax.plot(range(epochs), costs_alpha[num_alpha_2])
+for num in range(len(costs)):
+    ax.plot(range(epochs), costs[num])
+ax.legend(["\u03B1: " + str(alpha) + s for s in ["", " (Stocastic)"] for alpha in alphas])
 plt.show()
