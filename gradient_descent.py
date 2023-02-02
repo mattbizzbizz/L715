@@ -4,35 +4,28 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-def gradient_descent(W, D, A, E):
+def gradient_descent(W, D, A, E, S, M):
 
     C = []
     X = np.array([row[0] for row in D])
     Y = np.array([row[1] for row in D])
 
     for e in range(E):
-        Y_hat = X * W
-        C.append(0.5 / len(X) * np.sum(np.square(Y_hat - Y)))
-        W = W - A * np.sum(np.multiply(X, Y_hat - Y)) / len(X)
 
-    return C
-
-
-def stocastic_gradient_descent(W, D, A, E):
-
-    C = []
-
-    for e in range(E):
-
-        np.random.shuffle(D)
-        X = np.array([row[0] for row in D])
-        Y = np.array([row[1] for row in D])
+        if S:
+            np.random.shuffle(D)
+            X = np.array([row[0] for row in D])
+            Y = np.array([row[1] for row in D])
 
         Y_hat = X * W
+
         C.append(0.5 / len(X) * np.sum(np.square(Y_hat - Y)))
 
-        for i in range(len(Y)):
-            W = W - A * (X[i] * (Y_hat[i] - Y[i])) / len(X)
+        if S or M > 0:
+            for i in range(0, len(Y), M):
+                W = W - A * np.sum((X[i:i+M] * (Y_hat[i:i+M] - Y[i:i+M]))) / len(X)
+        else:
+            W = W - A * np.sum(np.multiply(X, Y_hat - Y)) / len(X)
 
     return C
 
@@ -48,12 +41,14 @@ weight = np.random.rand()
 costs = []
 
 for alpha in alphas:
-    costs.append(gradient_descent(weight, data, alpha, epochs))
-for alpha in alphas:
-    costs.append(stocastic_gradient_descent(weight, np.copy(data), alpha, epochs))
+    costs.append(gradient_descent(weight, data, alpha, epochs, False, 1))
+costs.append(gradient_descent(weight, np.copy(data), 0.1, epochs, True, 1))
+costs.append(gradient_descent(weight, np.copy(data), 0.1, epochs, False, 5))
+
+linestyles = ['solid', 'solid', 'solid', 'dashed', 'dotted']
 
 fi, ax = plt.subplots()
-for num in range(len(costs)):
-    ax.plot(range(epochs), costs[num])
-ax.legend(["\u03B1: " + str(alpha) + s for s in ["", " (Stocastic)"] for alpha in alphas])
+for num, linestyle in zip(range(len(costs)), linestyles):
+    ax.plot(range(epochs), costs[num], linestyle = linestyle)
+ax.legend(["\u03B1: 0.1", "\u03B1: 0.01", "\u03B1: 0.001", "\u03B1: 0.001 (stocastic)", "\u03B1: 0.001 (minibatch = 5)"])
 plt.show()
