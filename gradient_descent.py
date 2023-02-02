@@ -4,9 +4,11 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-def gradient_descent(W, X, Y, A, E):
+def gradient_descent(W, D, A, E):
 
     C = []
+    X = np.array([row[0] for row in D])
+    Y = np.array([row[1] for row in D])
 
     for e in range(E):
         Y_hat = X * W
@@ -16,15 +18,16 @@ def gradient_descent(W, X, Y, A, E):
     return C
 
 
-def stocastic_gradient_descent(W, X, Y, A, E):
+def stocastic_gradient_descent(W, D, A, E):
 
     C = []
 
     for e in range(E):
 
-        print("------Epoch " + str(e) + "------")
+        np.random.shuffle(D)
+        X = np.array([row[0] for row in D])
+        Y = np.array([row[1] for row in D])
 
-        np.random.shuffle(X)
         Y_hat = X * W
         C.append(0.5 / len(X) * np.sum(np.square(Y_hat - Y)))
 
@@ -35,19 +38,19 @@ def stocastic_gradient_descent(W, X, Y, A, E):
 
 np.random.seed(3)
 
-epochs = 50
+epochs = 3000
 alphas = [0.1, 0.01, 0.001]
 
 x = np.random.randn(100, 1)
 y = 4 + 3 * x + np.random.randn(100, 1)
+data = np.concatenate((x, y), axis = 1)
 weight = np.random.rand()
 costs = []
 
 for alpha in alphas:
-    costs.append(gradient_descent(weight, x, y, alpha, epochs))
+    costs.append(gradient_descent(weight, data, alpha, epochs))
 for alpha in alphas:
-    costs.append(stocastic_gradient_descent(weight, np.copy(x), y, alpha, epochs))
-
+    costs.append(stocastic_gradient_descent(weight, np.copy(data), alpha, epochs))
 
 fi, ax = plt.subplots()
 for num in range(len(costs)):
