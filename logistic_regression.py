@@ -21,6 +21,29 @@ def cross_entropy_loss(X, Y, W, B):
     S = sigmoid(np.dot(X, W) + B)
     return -(Y * np.log(S) + (1 - Y) * np.log(1 - S))
 
+
+# Calculate costs for graident descent
+def stocastic_gradient_descent(X, Y, W, A, E):
+
+    m = len(X) # Number of training examples
+    cost = [] # Costs
+    indices = list(range(len(X)))
+
+    # Iterate through epochs to:
+    #     (i) Calculate and store cost
+    #     (ii) Update weight
+    for e in range(E):
+
+        np.random.shuffle(indices) # Randomize indices
+
+        for i in indices:
+
+            diff = X[i] * W - Y[i]
+            cost.append(np.dot(diff, diff) / (2 * m))
+            W -= A * np.dot(X[i], diff) / m
+
+    return cost
+
 def logistic_regression(X, Y, W, B, A, E):
     return softmax(np.array(np.dot(X, W) + B))
 
