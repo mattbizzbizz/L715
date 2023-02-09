@@ -17,9 +17,12 @@ def softmax(Z):
 
     return np.array(ret)
 
+def cross_entropy_loss(X, Y, W, B):
+    S = sigmoid(np.dot(X, W) + B)
+    return -(Y * np.log(S) + (1 - Y) * np.log(1 - S))
+
 def logistic_regression(X, Y, W, B, A, E):
-    Y_hat = softmax(np.array(np.dot(W, X) + B))
-    return Y_hat
+    return softmax(np.array(np.dot(X, W) + B))
 
 X, y = datasets.make_blobs(n_samples=100, n_features=3, centers=5, cluster_std=1.05, random_state=3)
 
@@ -33,8 +36,3 @@ biases = np.array(np.random.randn(len(X)))
 
 #for x, y in list(zip(X, y))[:10]:
 #    print(x, y)
-
-#print(X[:10])
-#print(softmax(np.dot(X, weights) + biases))
-
-print(softmax([0.6, 1.1, -1.5, 1.2, 3.2, -1.1]))
