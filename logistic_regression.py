@@ -98,5 +98,5 @@ ax = fig.add_subplot()
 print(acc_list[:10])
 for class_ in acc_list[0]:
     ax.plot(range(epochs), [epoch[class_][1] for epoch in acc_list])
-ax.legend(["Class " + str(i + 1) for i in range(5)])
+ax.legend(["Class " + str(i + 1) for i in range(5)], title = "Number of instances correctly classified")
 plt.show()
