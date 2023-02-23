@@ -37,9 +37,12 @@ def softmax(Z):
 def logistic_regression(X, Y, W, B, A, E):
 
     m = len(Y) # Number of data points
-    indices = list(range(m + 1)) # Indices of data points
+    print('m:', m)
+    indices = list(range(m)) # Indices of data points
+    print('indices:', indices)
     costs = [] # Array of losses across epochs
     XX = np.concatenate((X, np.ones((X.shape[0], 1))), axis = 1) # X with 1's in last row for partial derivative of b
+    print('length of XX:', len(XX))
 
     # Iterate through epochs to:
     #     (i) Calculate and store cost
@@ -54,9 +57,8 @@ def logistic_regression(X, Y, W, B, A, E):
         #     (i) Calculate loss
         #     (ii) Update weight
         for i in indices:
-            print('diff:', diff)
-            print('XX[i]', XX[i])
-            loss[i] = [diff * XX_i for XX_i in XX[i]]
+            print('i:', i)
+            loss[i] = np.sum([diff * XX_i for XX_i in XX[i]])
             W -= A * loss[i]
 
         costs.append(loss) # Append loss matrix to costs
@@ -68,12 +70,12 @@ X, y = datasets.make_blobs(n_samples=100, n_features=3, centers=5, cluster_std=1
 weights = np.array(np.random.randn(len(X[0]))) # Weights
 biases = np.array(np.random.randn(len(X))) # Biases
 
-logistic_regression(X, y, weights, biases, 0.1, 10)
+#logistic_regression(X, y, weights, biases, 0.1, 10)
 
 #fig = plt.figure()
 #ax = fig.add_subplot(projection='3d')
 #ax.scatter(X[:,0], X[:,1], X[:,2], c=y)
 #plt.show()
-
+#
 #for x, y in list(zip(X, y))[:10]:
 #    print(x, y)
